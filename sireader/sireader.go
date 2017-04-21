@@ -1,5 +1,9 @@
 package sireader
 
+import (
+	"time"
+	"github.com/tarm/serial"
+)
 
 type ProtoConfig struct {
 	ExtProto byte
@@ -9,25 +13,34 @@ type ProtoConfig struct {
 	PunchRead byte
 }
 
-
 type Reader struct {
-	serial *Serial
+	port *serial.Port
+	protoConfig ProtoConfig
 	debug bool
 	logfile string
-	protoConfig ProtoConfig
+}
+
+func NewReader(port string) (*Reader, error) {
+	c := &serial.Config{Name: port, Baud: 34800}
+	s, err := serial.OpenPort(c)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Reader{port: s}, nil
 }
 
 func (r *Reader) SetExtendedProtocol(extended bool)
 
-func (r *Reader) SetAutosend(autosend bool)
+func (r *Reader) SetAutoSend(autoSend bool)
 
 func (r *Reader) SetOperatingMode(mode string)
 
 func (r *Reader) SetStationCode(code int)
 
-func (r *Reader) GetTime() DateTime
+func (r *Reader) GetTime() time.Time
 
-func (r *Reader) SetTime()
+func (r *Reader) SetTime(t *time.Time)
 
 func (r *Reader) Beep()
 
@@ -72,11 +85,11 @@ type ReaderReadout struct {
 
 func (rr *ReaderReadout) PollCard()
 
-func (rr *ReaderReadout) ReadCard(reftime int)
+func (rr *ReaderReadout) ReadCard(refTime int)
 
 func (rr *ReaderReadout) AckCard()
 
-func (rr *ReaderReadout) readCommand(timeout int) 
+func (rr *ReaderReadout) readCommand(timeout int)
 
 
 type ReaderControl struct {
