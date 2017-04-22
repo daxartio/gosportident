@@ -2,6 +2,7 @@ package sireader
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestNewReader(t *testing.T) {
@@ -12,12 +13,47 @@ func TestNewReader(t *testing.T) {
 	reader.debug = true
 }
 
-func TestToInt(t *testing.T)
+type testBytesToInt struct {
+	values []byte
+	result int
+}
 
-func TestToString(t *testing.T)
+func TestToInt(t *testing.T) {
+	println("TestToInt")
+	variable := []testBytesToInt{
+		{[]byte("\xee\xee"), 61166},
+		{TIME_RESET, 61166},
+		{[]byte{'\x00'}, 0},
+		{BC_SI5_DET, 70},
+		{BC_SI6_WRITEPAGE, 98},
+	}
+	for _, v := range variable {
+		res := toInt(v.values)
+		if res != v.result {
+			t.Error(
+				"For", v.values,
+				"expected", v.result,
+				"got", res,
+			)
+		} else {
+			fmt.Println(v.values, " Ok")
+		}
+	}
+}
 
-func TestCrc(t *testing.T)
+func TestToString(t *testing.T) {
+	println("TestToString")
+	fmt.Println(toString(65535))
+}
 
-func TestCrcCheck(t *testing.T)
+func TestCrc(t *testing.T) {
 
-func TestDecodeTime(t *testing.T)
+}
+
+func TestCrcCheck(t *testing.T) {
+
+}
+
+func TestDecodeTime(t *testing.T) {
+
+}
