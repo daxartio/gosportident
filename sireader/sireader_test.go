@@ -43,7 +43,7 @@ func TestToInt(t *testing.T) {
 
 func TestToString(t *testing.T) {
 	println("TestToString")
-	fmt.Println(toString(65535))
+	fmt.Println(toBytes(65535))
 }
 
 func TestCrc(t *testing.T) {

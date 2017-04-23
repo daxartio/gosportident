@@ -121,13 +121,13 @@ const (
 	CRC_BITF    = 0x8000
 )
 
-const (
-	STX    byte = 0x02
-	ETX    byte = 0x03
-	ACK    byte = 0x06
-	NAK    byte = 0x15
-	DLE    byte = 0x10
-	WAKEUP byte = 0xFF
+var (
+	STX    = []byte{'\x02'}
+	ETX    = []byte{'\x03'}
+	ACK    = []byte{'\x06'}
+	NAK    = []byte{'\x15'}
+	DLE    = []byte{'\x10'}
+	WAKEUP = []byte{'\xFF'}
 )
 
 var (

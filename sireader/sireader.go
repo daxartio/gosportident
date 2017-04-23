@@ -91,9 +91,9 @@ func toInt(s []byte) int {
 	return int(value)
 }
 
-func toString(i int) []byte {
+func toBytes(integer int) []byte {
 	b := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b, uint16(i))
+	binary.LittleEndian.PutUint16(b, uint16(integer))
 	return b
 }
 
@@ -121,8 +121,20 @@ func decodeCardData() {
 
 }
 
-func (r *Reader) sendCommand() {
+func (r *Reader) sendCommand(command []byte, parameters int) (int, error){
+	cmd := append(STX)
+	for _, c := range command {
+		cmd = append(cmd, c)
+	}
+	for _, e := range ETX {
+		cmd = append(cmd, e)
+	}
+	i, err := r.port.Write(cmd)
+	if err != nil {
+		return nil, err
+	}
 
+	return i, nil
 }
 
 func (r *Reader) readCommand() {
