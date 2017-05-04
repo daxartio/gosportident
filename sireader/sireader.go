@@ -121,7 +121,7 @@ func decodeCardData() {
 
 }
 
-func (r *Reader) sendCommand(command []byte, parameters int) (int, error){
+func (r *Reader) sendCommand(command []byte) (int, error){
 	cmd := append(STX)
 	for _, c := range command {
 		cmd = append(cmd, c)
@@ -129,12 +129,8 @@ func (r *Reader) sendCommand(command []byte, parameters int) (int, error){
 	for _, e := range ETX {
 		cmd = append(cmd, e)
 	}
-	i, err := r.port.Write(cmd)
-	if err != nil {
-		return nil, err
-	}
 
-	return i, nil
+	return r.port.Write(cmd)
 }
 
 func (r *Reader) readCommand() {

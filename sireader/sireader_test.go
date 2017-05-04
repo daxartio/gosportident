@@ -3,14 +3,44 @@ package sireader
 import (
 	"testing"
 	"fmt"
+	"log"
 )
 
 func TestNewReader(t *testing.T) {
-	reader, err := NewReader("COM45")
+	reader, err := NewReader("COM3")
 	if err != nil {
 		t.Fatal(err)
 	}
-	reader.debug = true
+
+	// FI
+	buf := make([]byte, 128)
+	n, err := reader.port.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(toInt(buf[:n]))
+
+	buf = make([]byte, 128)
+	n, err = reader.port.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(toInt(buf[:n]))
+
+	// FO
+	buf = make([]byte, 128)
+	n, err = reader.port.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(toInt(buf[:n]))
+
+	buf = make([]byte, 128)
+	n, err = reader.port.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(toInt(buf[:n]))
 }
 
 type testBytesToInt struct {
