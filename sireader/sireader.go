@@ -92,13 +92,11 @@ func toInt(s []byte) int {
 	return int(value)
 }
 
-func toBytes(data interface{}) ([]byte, error) {
+func toBytes(data int) []byte {
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.LittleEndian, data)
-	if err == nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	num := uint32(data)
+	binary.Write(buf, binary.LittleEndian, num)
+	return buf.Bytes()
 }
 
 func crc(b []byte) []byte {
@@ -142,8 +140,8 @@ func decodeCardData() {
 }
 
 func (r *Reader) sendCommand(command []byte) (int, error){
-	cmd := append(STX, command...)
-	cmd = append(cmd, ETX...)
+	cmd := append(Bytes(STX), command...)
+	cmd = append(cmd, ETX)
 
 	return r.port.Write(cmd)
 }

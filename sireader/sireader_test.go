@@ -48,16 +48,17 @@ type testBytesToInt struct {
 	values []byte
 	result int
 }
-
-func TestToInt(t *testing.T) {
-	println("TestToInt")
-	variable := []testBytesToInt{
+var variable = []testBytesToInt{
 		{[]byte("\xee\xee"), 61166},
 		{TIME_RESET, 61166},
 		{[]byte{0x00}, 0},
-		{BC_SI5_DET, 70},
-		{BC_SI6_WRITEPAGE, 98},
+		{Bytes(BC_SI5_DET), 70},
+		{Bytes(BC_SI6_WRITEPAGE), 98},
 	}
+
+func TestToInt(t *testing.T) {
+	println("TestToInt")
+
 	for _, v := range variable {
 		res := toInt(v.values)
 		if res != v.result {
@@ -74,15 +75,8 @@ func TestToInt(t *testing.T) {
 
 func TestToBytes(t *testing.T) {
 	println("TestToBytes")
-	variable := []testBytesToInt{
-		{[]byte("\xee\xee"), 61166},
-		{TIME_RESET, 61166},
-		{[]byte{0x00}, 0},
-		{BC_SI5_DET, 70},
-		{BC_SI6_WRITEPAGE, 98},
-	}
 	for _, v := range variable {
-		res, _ := toBytes(v.result)
+		res:= toBytes(v.result)
 		if bytes.Equal(res, v.values) {
 			t.Error(
 				"For", v.result,
