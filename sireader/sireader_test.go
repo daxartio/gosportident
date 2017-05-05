@@ -3,6 +3,7 @@ package sireader
 import (
 	"testing"
 	"fmt"
+	"bytes"
 	"log"
 )
 
@@ -53,7 +54,7 @@ func TestToInt(t *testing.T) {
 	variable := []testBytesToInt{
 		{[]byte("\xee\xee"), 61166},
 		{TIME_RESET, 61166},
-		{[]byte{'\x00'}, 0},
+		{[]byte{0x00}, 0},
 		{BC_SI5_DET, 70},
 		{BC_SI6_WRITEPAGE, 98},
 	}
@@ -67,6 +68,29 @@ func TestToInt(t *testing.T) {
 			)
 		} else {
 			fmt.Println(v.values, " Ok")
+		}
+	}
+}
+
+func TestToBytes(t *testing.T) {
+	println("TestToBytes")
+	variable := []testBytesToInt{
+		{[]byte("\xee\xee"), 61166},
+		{TIME_RESET, 61166},
+		{[]byte{0x00}, 0},
+		{BC_SI5_DET, 70},
+		{BC_SI6_WRITEPAGE, 98},
+	}
+	for _, v := range variable {
+		res, _ := toBytes(v.result)
+		if bytes.Equal(res, v.values) {
+			t.Error(
+				"For", v.result,
+				"expected", v.values,
+				"got", res,
+			)
+		} else {
+			println(v.result, res, " Ok")
 		}
 	}
 }

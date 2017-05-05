@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/tarm/serial"
 	"encoding/binary"
+	"bytes"
 )
 
 type ProtoConfig struct {
@@ -91,14 +92,33 @@ func toInt(s []byte) int {
 	return int(value)
 }
 
-func toBytes(integer int) []byte {
-	b := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b, uint16(integer))
-	return b
+func toBytes(data interface{}) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, data)
+	if err == nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
-func crc(s string) byte {
-	return 0
+func crc(b []byte) []byte {
+	toChars := func (s []byte)([]byte, error) {
+		if len(s) == 0 {
+			return nil, nil
+		}
+		if len(s)%2 == 0 {
+			s = append(s, []byte{0x00, 0x00}...)
+		} else {
+			s = append(s, 0x00)
+		}
+		// TODO cделать генератор
+
+		return []byte{}, nil
+	}
+	//crc := toInt(b[:2])
+	toChars(b[2:])
+
+	return []byte{}
 }
 
 func crcCheck(s string, crc string) bool {
@@ -122,13 +142,8 @@ func decodeCardData() {
 }
 
 func (r *Reader) sendCommand(command []byte) (int, error){
-	cmd := append(STX)
-	for _, c := range command {
-		cmd = append(cmd, c)
-	}
-	for _, e := range ETX {
-		cmd = append(cmd, e)
-	}
+	cmd := append(STX, command...)
+	cmd = append(cmd, ETX...)
 
 	return r.port.Write(cmd)
 }

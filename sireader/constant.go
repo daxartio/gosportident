@@ -13,7 +13,7 @@ const (
 
 const REC_LEN = 8
 
-var TIME_RESET = []byte{'\xEE', '\xEE'}
+var TIME_RESET = []byte{0xEE, 0xEE}
 
 const (
 	CARD_SI5_CN2 = 6
@@ -122,108 +122,108 @@ const (
 )
 
 var (
-	STX    = []byte{'\x02'}
-	ETX    = []byte{'\x03'}
-	ACK    = []byte{'\x06'}
-	NAK    = []byte{'\x15'}
-	DLE    = []byte{'\x10'}
-	WAKEUP = []byte{'\xFF'}
+	STX    = []byte{0x02}
+	ETX    = []byte{0x03}
+	ACK    = []byte{0x06}
+	NAK    = []byte{0x15}
+	DLE    = []byte{0x10}
+	WAKEUP = []byte{0xFF}
 )
 
 var (
-	BC_SET_CARDNO    = []byte{'\x30'}
-	BC_GET_SI5       = []byte{'\x31'}
-	BC_TRANS_REC     = []byte{'\x33'}
-	BC_SI5_WRITE     = []byte{'\x43'}
-	BC_SI5_DET       = []byte{'\x46'}
-	BC_TRANS_REC2    = []byte{'\x53'}
-	BC_TRANS_TIME    = []byte{'\x54'}
-	BC_GET_SI6       = []byte{'\x61'}
-	BC_SI6_WRITEPAGE = []byte{'\x62'}
-	BC_SI6_READWORD  = []byte{'\x63'}
-	BC_SI6_WRITEWORD = []byte{'\x64'}
-	BC_SI6_DET       = []byte{'\x66'}
-	BC_SET_MS        = []byte{'\x70'}
-	BC_GET_MS        = []byte{'\x71'}
-	BC_SET_SYS_VAL   = []byte{'\x72'}
-	BC_GET_SYS_VAL   = []byte{'\x73'}
-	BC_GET_BACKUP    = []byte{'\x74'}
-	BC_ERASE_BACKUP  = []byte{'\x75'}
-	BC_SET_TIME      = []byte{'\x76'}
-	BC_GET_TIME      = []byte{'\x77'}
-	BC_OFF           = []byte{'\x78'}
-	BC_RESET         = []byte{'\x79'}
-	BC_GET_BACKUP2   = []byte{'\x7A'}
-	BC_SET_BAUD      = []byte{'\x7E'}
+	BC_SET_CARDNO    = []byte{0x30}
+	BC_GET_SI5       = []byte{0x31}
+	BC_TRANS_REC     = []byte{0x33}
+	BC_SI5_WRITE     = []byte{0x43}
+	BC_SI5_DET       = []byte{0x46}
+	BC_TRANS_REC2    = []byte{0x53}
+	BC_TRANS_TIME    = []byte{0x54}
+	BC_GET_SI6       = []byte{0x61}
+	BC_SI6_WRITEPAGE = []byte{0x62}
+	BC_SI6_READWORD  = []byte{0x63}
+	BC_SI6_WRITEWORD = []byte{0x64}
+	BC_SI6_DET       = []byte{0x66}
+	BC_SET_MS        = []byte{0x70}
+	BC_GET_MS        = []byte{0x71}
+	BC_SET_SYS_VAL   = []byte{0x72}
+	BC_GET_SYS_VAL   = []byte{0x73}
+	BC_GET_BACKUP    = []byte{0x74}
+	BC_ERASE_BACKUP  = []byte{0x75}
+	BC_SET_TIME      = []byte{0x76}
+	BC_GET_TIME      = []byte{0x77}
+	BC_OFF           = []byte{0x78}
+	BC_RESET         = []byte{0x79}
+	BC_GET_BACKUP2   = []byte{0x7A}
+	BC_SET_BAUD      = []byte{0x7E}
 )
 
 var (
-	C_GET_BACKUP   = []byte{'\x81'}
-	C_SET_SYS_VAL  = []byte{'\x82'}
-	C_GET_SYS_VAL  = []byte{'\x83'}
-	C_SRR_WRITE    = []byte{'\xA2'}
-	C_SRR_READ     = []byte{'\xA3'}
-	C_SRR_QUERY    = []byte{'\xA6'}
-	C_SRR_PING     = []byte{'\xA7'}
-	C_SRR_ADHOC    = []byte{'\xA8'}
-	C_GET_SI5      = []byte{'\xB1'}
-	C_SI5_WRITE    = []byte{'\xC3'}
-	C_TRANS_REC    = []byte{'\xD3'}
-	C_CLEAR_CARD   = []byte{'\xE0'}
-	C_GET_SI6      = []byte{'\xE1'}
-	C_SI5_DET      = []byte{'\xE5'}
-	C_SI6_DET      = []byte{'\xE6'}
-	C_SI_REM       = []byte{'\xE7'}
-	C_SI9_DET      = []byte{'\xE8'}
-	C_SI9_WRITE    = []byte{'\xEA'}
-	C_GET_SI9      = []byte{'\xEF'}
-	C_SET_MS       = []byte{'\xF0'}
-	C_GET_MS       = []byte{'\xF1'}
-	C_ERASE_BACKUP = []byte{'\xF5'}
-	C_SET_TIME     = []byte{'\xF6'}
-	C_GET_TIME     = []byte{'\xF7'}
-	C_OFF          = []byte{'\xF8'}
-	C_BEEP         = []byte{'\xF9'}
-	C_SET_BAUD     = []byte{'\xFE'}
+	C_GET_BACKUP   = []byte{0x81}
+	C_SET_SYS_VAL  = []byte{0x82}
+	C_GET_SYS_VAL  = []byte{0x83}
+	C_SRR_WRITE    = []byte{0xA2}
+	C_SRR_READ     = []byte{0xA3}
+	C_SRR_QUERY    = []byte{0xA6}
+	C_SRR_PING     = []byte{0xA7}
+	C_SRR_ADHOC    = []byte{0xA8}
+	C_GET_SI5      = []byte{0xB1}
+	C_SI5_WRITE    = []byte{0xC3}
+	C_TRANS_REC    = []byte{0xD3}
+	C_CLEAR_CARD   = []byte{0xE0}
+	C_GET_SI6      = []byte{0xE1}
+	C_SI5_DET      = []byte{0xE5}
+	C_SI6_DET      = []byte{0xE6}
+	C_SI_REM       = []byte{0xE7}
+	C_SI9_DET      = []byte{0xE8}
+	C_SI9_WRITE    = []byte{0xEA}
+	C_GET_SI9      = []byte{0xEF}
+	C_SET_MS       = []byte{0xF0}
+	C_GET_MS       = []byte{0xF1}
+	C_ERASE_BACKUP = []byte{0xF5}
+	C_SET_TIME     = []byte{0xF6}
+	C_GET_TIME     = []byte{0xF7}
+	C_OFF          = []byte{0xF8}
+	C_BEEP         = []byte{0xF9}
+	C_SET_BAUD     = []byte{0xFE}
 )
 
 var (
-	P_MS_DIRECT   = []byte{'\x4D'}
-	P_MS_INDIRECT = []byte{'\x53'}
-	P_SI6_CB      = []byte{'\x08'}
+	P_MS_DIRECT   = []byte{0x4D}
+	P_MS_INDIRECT = []byte{0x53}
+	P_SI6_CB      = []byte{0x08}
 )
 
 var (
-	O_OLD_SERIAL = []byte{'\x00'}
-	O_OLD_CPU_ID = []byte{'\x02'}
-	O_SERIAL_NO  = []byte{'\x00'}
+	O_OLD_SERIAL = []byte{0x00}
+	O_OLD_CPU_ID = []byte{0x02}
+	O_SERIAL_NO  = []byte{0x00}
 
-	O_SRR_CFG = []byte{'\x04'}
+	O_SRR_CFG = []byte{0x04}
 
-	O_FIRMWARE   = []byte{'\x05'}
-	O_BUILD_DATE = []byte{'\x08'}
-	O_MODEL_ID   = []byte{'\x0B'}
+	O_FIRMWARE   = []byte{0x05}
+	O_BUILD_DATE = []byte{0x08}
+	O_MODEL_ID   = []byte{0x0B}
 )
 
 var (
-	O_MEM_SIZE   = []byte{'\x0D'}
-	O_BAT_DATE   = []byte{'\x15'}
-	O_BAT_CAP    = []byte{'\x19'}
-	O_BACKUP_PTR = []byte{'\x1C'}
-	O_SI6_CB     = []byte{'\x33'}
+	O_MEM_SIZE   = []byte{0x0D}
+	O_BAT_DATE   = []byte{0x15}
+	O_BAT_CAP    = []byte{0x19}
+	O_BACKUP_PTR = []byte{0x1C}
+	O_SI6_CB     = []byte{0x33}
 
-	O_SRR_CHANNEL  = []byte{'\x34'}
-	O_MEM_OVERFLOW = []byte{'\x3D'}
-	O_PROGRAM      = []byte{'\x70'}
-	O_MODE         = []byte{'\x71'}
-	O_STATION_CODE = []byte{'\x72'}
-	O_FEEDBACK     = []byte{'\x73'}
+	O_SRR_CHANNEL  = []byte{0x34}
+	O_MEM_OVERFLOW = []byte{0x3D}
+	O_PROGRAM      = []byte{0x70}
+	O_MODE         = []byte{0x71}
+	O_STATION_CODE = []byte{0x72}
+	O_FEEDBACK     = []byte{0x73}
 
-	O_PROTO = []byte{'\x74'}
+	O_PROTO = []byte{0x74}
 
-	O_WAKEUP_DATE = []byte{'\x75'}
-	O_WAKEUP_TIME = []byte{'\x78'}
-	O_SLEEP_TIME  = []byte{'\x7B'}
+	O_WAKEUP_DATE = []byte{0x75}
+	O_WAKEUP_TIME = []byte{0x78}
+	O_SLEEP_TIME  = []byte{0x7B}
 )
 
 const (
