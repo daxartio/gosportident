@@ -94,7 +94,7 @@ func toInt(s []byte) int {
 
 func toBytes(data int) []byte {
 	buf := new(bytes.Buffer)
-	num := uint32(data)
+	num := uint64(data)
 	binary.Write(buf, binary.LittleEndian, num)
 	return buf.Bytes()
 }
@@ -139,9 +139,9 @@ func decodeCardData() {
 
 }
 
-func (r *Reader) sendCommand(command []byte) (int, error){
-	cmd := append(Bytes(STX), command...)
-	cmd = append(cmd, ETX)
+func (r *Reader) sendCommand(command, parameters []byte) (int, error){
+	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
+	cmd = BytesMerge(Bytes(STX), cmd, crc(cmd), Bytes(ETX))
 
 	return r.port.Write(cmd)
 }

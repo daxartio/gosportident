@@ -54,6 +54,7 @@ var variable = []testBytesToInt{
 		{[]byte{0x00}, 0},
 		{Bytes(BC_SI5_DET), 70},
 		{Bytes(BC_SI6_WRITEPAGE), 98},
+		{Bytes(0x02), 2},
 	}
 
 func TestToInt(t *testing.T) {
@@ -84,7 +85,7 @@ func TestToBytes(t *testing.T) {
 				"got", res,
 			)
 		} else {
-			println(v.result, res, " Ok")
+			fmt.Println(v.result, res, " Ok")
 		}
 	}
 }

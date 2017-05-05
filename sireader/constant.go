@@ -254,3 +254,12 @@ func Bytes(args ...byte) []byte {
 
 	return bs
 }
+
+func BytesMerge(args ...[]byte) []byte {
+	bs := []byte{}
+	for _, b := range args {
+		bs = append(bs, b...)
+	}
+
+	return bs
+}
