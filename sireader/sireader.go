@@ -100,7 +100,7 @@ func toBytes(data int) []byte {
 }
 
 func crc(b []byte) []byte {
-	toChars := func (s []byte)([]byte, error) {
+	toChars := func (s []byte)([][]byte, error) {
 		if len(s) == 0 {
 			return nil, nil
 		}
@@ -110,13 +110,44 @@ func crc(b []byte) []byte {
 			s = append(s, 0x00)
 		}
 		// TODO cделать генератор
-
-		return []byte{}, nil
+		result := [][]byte{}
+		for i:=0; i< len(s); i++ {
+			result = append(result, s[i:i+2])
+			i++
+		}
+		return result, nil
 	}
-	//crc := toInt(b[:2])
-	toChars(b[2:])
 
-	return []byte{}
+	if len(b) < 1 {
+		return Bytes(0x00, 0x00)
+	}
+
+	crc := uint(toInt(b[:2]))
+	ch, _ := toChars(b[2:])
+	for _, c := range ch {
+		val := uint(toInt(c))
+		for j:=0; j < 16; j++ {
+			if (crc & CRC_BITF) !=0 {
+				crc <<= 1
+
+				if (val & CRC_BITF) != 0 {
+					crc += 1
+				}
+
+				crc ^= CRC_POLYNOM
+			} else {
+				crc <<= 1
+
+				if (val & CRC_BITF) != 0 {
+					crc += 1
+				}
+			}
+			val <<= 1
+		}
+	}
+
+	crc &= 0xFFFF
+	return BytesMerge(toBytes(int(crc >> 8)), toBytes(int(crc & 0xFF)))
 }
 
 func crcCheck(s string, crc string) bool {
