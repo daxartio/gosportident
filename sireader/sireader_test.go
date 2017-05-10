@@ -3,8 +3,8 @@ package sireader
 import (
 	"testing"
 	"fmt"
-	"bytes"
 	"log"
+	"bytes"
 )
 
 func TestNewReader(t *testing.T) {
@@ -19,6 +19,7 @@ func TestNewReader(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(buf[:n])
 	fmt.Println(toInt(buf[:n]))
 
 	buf = make([]byte, 128)
@@ -26,6 +27,7 @@ func TestNewReader(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(buf[:n])
 	fmt.Println(toInt(buf[:n]))
 
 	// FO
@@ -34,6 +36,7 @@ func TestNewReader(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(buf[:n])
 	fmt.Println(toInt(buf[:n]))
 
 	buf = make([]byte, 128)
@@ -41,6 +44,7 @@ func TestNewReader(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(buf[:n])
 	fmt.Println(toInt(buf[:n]))
 }
 

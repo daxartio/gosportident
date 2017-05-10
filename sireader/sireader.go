@@ -23,7 +23,7 @@ type Reader struct {
 }
 
 func NewReader(port string) (*Reader, error) {
-	c := &serial.Config{Name: port, Baud: 34800}
+	c := &serial.Config{Name: port, Baud: 38400, ReadTimeout: time.Second * 5}
 	s, err := serial.OpenPort(c)
 	if err != nil {
 		return nil, err
