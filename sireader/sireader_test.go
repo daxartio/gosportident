@@ -52,14 +52,15 @@ type testBytesToInt struct {
 	values []byte
 	result int
 }
+
 var variable = []testBytesToInt{
-		{[]byte("\xee\xee"), 61166},
-		{TIME_RESET, 61166},
-		{[]byte{0x00}, 0},
-		{Bytes(BC_SI5_DET), 70},
-		{Bytes(BC_SI6_WRITEPAGE), 98},
-		{Bytes(0x02), 2},
-	}
+	{[]byte("\xee\xee"), 61166},
+	{TIME_RESET, 61166},
+	{[]byte{0x00}, 0},
+	{Bytes(BC_SI5_DET), 70},
+	{Bytes(BC_SI6_WRITEPAGE), 98},
+	{Bytes(0x02), 2},
+}
 
 func TestToInt(t *testing.T) {
 	println("TestToInt")
@@ -81,7 +82,7 @@ func TestToInt(t *testing.T) {
 func TestToBytes(t *testing.T) {
 	println("TestToBytes")
 	for _, v := range variable {
-		res:= toBytes(v.result)
+		res := toBytes(v.result)
 		if bytes.Equal(res, v.values) {
 			t.Error(
 				"For", v.result,
@@ -100,7 +101,14 @@ func TestToString(t *testing.T) {
 }
 
 func TestCrc(t *testing.T) {
-
+	b := Bytes(0x53, 0x08, 0x05, 0x01,
+		0x0F, 0xB5, 0x00, 0x00,
+		0x1E, 0x08)
+	//b := Bytes( 0x53,  0x00)
+	fmt.Println(b)
+	fmt.Println(crc(b))
+	fmt.Println(toInt(crc(b)))
+	fmt.Println(crc([]byte{}))
 }
 
 func TestCrcCheck(t *testing.T) {

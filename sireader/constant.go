@@ -13,7 +13,8 @@ const (
 
 const REC_LEN = 8
 
-const EE  = 0xEE
+const EE = 0xEE
+
 var TIME_RESET = Bytes(EE, EE)
 
 const (
@@ -244,7 +245,6 @@ const (
 	M_BC_FINISH    = 0x14
 	M_BC_READOUT   = 0x15
 )
-
 
 func Bytes(args ...byte) []byte {
 	bs := []byte{}

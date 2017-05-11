@@ -77,7 +77,15 @@ func (r *Reader) connectReader() {
 }
 
 func (r *Reader) updateProtoConfig() ProtoConfig {
-	return ProtoConfig{}
+	//ret, _ := r.sendCommand(Bytes(C_GET_SYS_VAL),Bytes(O_PROTO, 0x01))
+	//configByte := uint(toInt(Bytes()))
+	protoConfig := ProtoConfig{}
+	//protoConfig.ExtProto = configByte & (1 << 0) != 0
+	//protoConfig.AutoSend = configByte & (1 << 1) != 0
+	//protoConfig.HandShake = configByte & (1 << 2) != 0
+	//protoConfig.PWAccess = configByte & (1 << 4) != 0
+	//protoConfig.PunchRead = configByte & (1 << 7) != 0
+	return protoConfig
 }
 
 func (r *Reader) SetProtoConfig(config ProtoConfig) {
@@ -100,7 +108,7 @@ func toBytes(data int) []byte {
 }
 
 func crc(b []byte) []byte {
-	toChars := func (s []byte)([][]byte, error) {
+	toChars := func(s []byte) ([][]byte, error) {
 		if len(s) == 0 {
 			return nil, nil
 		}
@@ -111,7 +119,7 @@ func crc(b []byte) []byte {
 		}
 		// TODO cделать генератор
 		result := [][]byte{}
-		for i:=0; i< len(s); i++ {
+		for i := 0; i < len(s); i++ {
 			result = append(result, s[i:i+2])
 			i++
 		}
@@ -121,13 +129,16 @@ func crc(b []byte) []byte {
 	if len(b) < 1 {
 		return Bytes(0x00, 0x00)
 	}
+	if len(b) == 2 {
+		return b
+	}
 
 	crc := uint(toInt(b[:2]))
 	ch, _ := toChars(b[2:])
 	for _, c := range ch {
 		val := uint(toInt(c))
-		for j:=0; j < 16; j++ {
-			if (crc & CRC_BITF) !=0 {
+		for j := 0; j < 16; j++ {
+			if (crc & CRC_BITF) != 0 {
 				crc <<= 1
 
 				if (val & CRC_BITF) != 0 {
@@ -147,7 +158,8 @@ func crc(b []byte) []byte {
 	}
 
 	crc &= 0xFFFF
-	return BytesMerge(toBytes(int(crc >> 8)), toBytes(int(crc & 0xFF)))
+	return BytesMerge(bytes.Trim(toBytes(int(crc>>8)), "\x00"),
+		bytes.Trim(toBytes(int(crc&0xFF)), "\x00"))
 }
 
 func crcCheck(s string, crc string) bool {
@@ -170,7 +182,7 @@ func decodeCardData() {
 
 }
 
-func (r *Reader) sendCommand(command, parameters []byte) (int, error){
+func (r *Reader) sendCommand(command, parameters []byte) (int, error) {
 	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
 	cmd = BytesMerge(Bytes(STX), cmd, crc(cmd), Bytes(ETX))
 
