@@ -1,10 +1,13 @@
 package sireader
 
 import (
-	"time"
-	"github.com/tarm/serial"
-	"encoding/binary"
 	"bytes"
+	"encoding/binary"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/tarm/serial"
 )
 
 type ProtoConfig struct {
@@ -28,8 +31,9 @@ func NewReader(port string) (*Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return &Reader{port: s}, nil
+	r := &Reader{port: s}
+	r.ConnectReader()
+	return r, nil
 }
 
 func (r *Reader) SetExtendedProtocol(extended bool) {
@@ -49,6 +53,8 @@ func (r *Reader) SetStationCode(code int) {
 }
 
 func (r *Reader) GetTime() time.Time {
+	bintTime, e := r.sendCommand([]byte{C_GET_TIME}, []byte{})
+	fmt.Println(bintTime, e)
 	return time.Time{}
 }
 
@@ -57,7 +63,7 @@ func (r *Reader) SetTime(t *time.Time) {
 }
 
 func (r *Reader) Beep() {
-
+	r.sendCommand([]byte{C_BEEP}, toBytes(1))
 }
 
 func (r *Reader) PowerOff() {
@@ -72,8 +78,9 @@ func (r *Reader) Reconnect() {
 
 }
 
-func (r *Reader) connectReader() {
-
+func (r *Reader) ConnectReader() {
+	r.port.Flush()
+	r.sendCommand([]byte{C_SET_MS}, []byte{P_MS_DIRECT})
 }
 
 func (r *Reader) updateProtoConfig() ProtoConfig {
@@ -186,11 +193,15 @@ func (r *Reader) sendCommand(command, parameters []byte) (int, error) {
 	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
 	cmd = BytesMerge(Bytes(STX), cmd, crc(cmd), Bytes(ETX))
 
-	return r.port.Write(cmd)
+	n, e := r.port.Write(cmd)
+	r.readCommand()
+	return n, e
 }
 
 func (r *Reader) readCommand() {
-
+	buf := make([]byte, 128)
+	n, _ := r.port.Read(buf)
+	log.Printf("%q", buf[:n])
 }
 
 type ReaderReadout struct {
