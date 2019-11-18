@@ -32,7 +32,7 @@ func NewReader(port string) (*Reader, error) {
 		return nil, err
 	}
 	r := &Reader{port: s}
-	r.ConnectReader()
+	// r.ConnectReader()
 	return r, nil
 }
 
@@ -63,7 +63,12 @@ func (r *Reader) SetTime(t *time.Time) {
 }
 
 func (r *Reader) Beep() {
-	r.sendCommand([]byte{C_BEEP}, toBytes(1))
+	// r.sendCommand([]byte{C_BEEP}, toBytes(1))
+	_, err := r.port.Write(BEEP_TWICE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.readCommand()
 }
 
 func (r *Reader) PowerOff() {
@@ -115,22 +120,21 @@ func toBytes(data int) []byte {
 }
 
 func crc(b []byte) []byte {
-	toChars := func(s []byte) ([][]byte, error) {
+	toChars := func(s []byte) [][]byte {
 		if len(s) == 0 {
-			return nil, nil
+			return nil
 		}
 		if len(s)%2 == 0 {
 			s = append(s, []byte{0x00, 0x00}...)
 		} else {
 			s = append(s, 0x00)
 		}
-		// TODO cделать генератор
 		result := [][]byte{}
 		for i := 0; i < len(s); i++ {
 			result = append(result, s[i:i+2])
 			i++
 		}
-		return result, nil
+		return result
 	}
 
 	if len(b) < 1 {
@@ -140,10 +144,10 @@ func crc(b []byte) []byte {
 		return b
 	}
 
-	crc := uint(toInt(b[:2]))
-	ch, _ := toChars(b[2:])
+	crc := uint16(toInt(b[:2]))
+	ch := toChars(b[2:])
 	for _, c := range ch {
-		val := uint(toInt(c))
+		val := uint16(toInt(c))
 		for j := 0; j < 16; j++ {
 			if (crc & CRC_BITF) != 0 {
 				crc <<= 1
@@ -200,7 +204,10 @@ func (r *Reader) sendCommand(command, parameters []byte) (int, error) {
 
 func (r *Reader) readCommand() {
 	buf := make([]byte, 128)
-	n, _ := r.port.Read(buf)
+	n, err := r.port.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Printf("%q", buf[:n])
 }
 

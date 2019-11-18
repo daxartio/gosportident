@@ -101,6 +101,7 @@ func TestToString(t *testing.T) {
 }
 
 func TestCrc(t *testing.T) {
+	println("TestCrc")
 	b := Bytes(0x53, 0x08, 0x05, 0x01,
 		0x0F, 0xB5, 0x00, 0x00,
 		0x1E, 0x08)
@@ -109,6 +110,12 @@ func TestCrc(t *testing.T) {
 	fmt.Println(crc(b))
 	fmt.Println(toInt(crc(b)))
 	fmt.Println(crc([]byte{}))
+	
+	println("TestCrc2")
+	cmdS := []byte{C_BEEP, 0x01, 0x02}
+	cmdR := []byte{0x14, 0x0A}
+	fmt.Println(cmdS, cmdR)
+	fmt.Println(crc(cmdS))
 }
 
 func TestCrcCheck(t *testing.T) {

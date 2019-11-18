@@ -246,6 +246,10 @@ const (
 	M_BC_READOUT   = 0x15
 )
 
+var (
+	BEEP_TWICE = []byte{STX, C_BEEP, 0x01, 0x02, 0x14, 0x0A, ETX}
+)
+
 func Bytes(args ...byte) []byte {
 	bs := []byte{}
 	for _, b := range args {
