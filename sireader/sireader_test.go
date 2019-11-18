@@ -27,7 +27,7 @@ func TestIntToBytes(t *testing.T) {
 }
 
 func TestCrcBeep(t *testing.T) {
-	sample := []byte{C_BEEP, 0x01, 0x02}
+	sample := []byte{CBeep, 0x01, 0x02}
 	expectedCRC := []byte{0x14, 0x0A}
 
 	sampleCRC := crc(sample)
@@ -51,8 +51,8 @@ func TestCrc(t *testing.T) {
 }
 
 func TestBytesMerge(t *testing.T) {
-	sample := [][]byte{[]byte{C_BEEP, 0x01, 0x02}, []byte{0x03}, []byte{}}
-	expected := []byte{C_BEEP, 0x01, 0x02, 0x03}
+	sample := [][]byte{[]byte{CBeep, 0x01, 0x02}, []byte{0x03}, []byte{}}
+	expected := []byte{CBeep, 0x01, 0x02, 0x03}
 	if !reflect.DeepEqual(BytesMerge(sample...), expected) {
 		t.Fatal("Merged bytes is not equal expected bytes")
 	}

@@ -1,2 +1,6 @@
 # GoSportident
 
+```
+golint ./...
+go test ./...
+```
