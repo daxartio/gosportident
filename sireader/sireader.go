@@ -31,7 +31,8 @@ func NewReader(port string) (*Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := &Reader{port: s}
+	r := new(Reader)
+	r.port = s
 	// r.ConnectReader()
 	return r, nil
 }
@@ -63,12 +64,7 @@ func (r *Reader) SetTime(t *time.Time) {
 }
 
 func (r *Reader) Beep() {
-	// r.sendCommand([]byte{C_BEEP}, toBytes(1))
-	_, err := r.port.Write(BEEP_TWICE)
-	if err != nil {
-		log.Fatal(err)
-	}
-	r.readCommand()
+	r.sendCommand([]byte{C_BEEP}, toBytes(1))
 }
 
 func (r *Reader) PowerOff() {
@@ -105,18 +101,23 @@ func (r *Reader) SetProtoConfig(config ProtoConfig) {
 }
 
 func toInt(s []byte) int {
-	value := uint(0)
-	for offset, c := range s {
-		value += uint(c) << (uint(offset) * uint(8))
+	value := 0
+	for _, c := range s {
+		value = value*256 + int(c)
 	}
-	return int(value)
+	return value
 }
 
 func toBytes(data int) []byte {
 	buf := new(bytes.Buffer)
-	num := uint64(data)
-	binary.Write(buf, binary.LittleEndian, num)
-	return buf.Bytes()
+	binary.Write(buf, binary.LittleEndian, uint64(data))
+	b := bytes.Trim(buf.Bytes(), "\x00")
+	bLenght := len(b)
+	result := make([]byte, bLenght)
+	for i := 0; i < bLenght; i++ {
+		result[i] = b[bLenght-1-i]
+	}
+	return result
 }
 
 func crc(b []byte) []byte {
@@ -138,7 +139,7 @@ func crc(b []byte) []byte {
 	}
 
 	if len(b) < 1 {
-		return Bytes(0x00, 0x00)
+		return []byte{0x00, 0x00}
 	}
 	if len(b) == 2 {
 		return b
@@ -169,8 +170,7 @@ func crc(b []byte) []byte {
 	}
 
 	crc &= 0xFFFF
-	return BytesMerge(bytes.Trim(toBytes(int(crc>>8)), "\x00"),
-		bytes.Trim(toBytes(int(crc&0xFF)), "\x00"))
+	return BytesMerge(toBytes(int(crc>>8)), toBytes(int(crc&0xFF)))
 }
 
 func crcCheck(s string, crc string) bool {
@@ -195,7 +195,7 @@ func decodeCardData() {
 
 func (r *Reader) sendCommand(command, parameters []byte) (int, error) {
 	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
-	cmd = BytesMerge(Bytes(STX), cmd, crc(cmd), Bytes(ETX))
+	cmd = BytesMerge([]byte{STX}, cmd, crc(cmd), []byte{ETX})
 
 	n, e := r.port.Write(cmd)
 	r.readCommand()

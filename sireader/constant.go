@@ -15,8 +15,6 @@ const REC_LEN = 8
 
 const EE = 0xEE
 
-var TIME_RESET = Bytes(EE, EE)
-
 const (
 	CARD_SI5_CN2 = 6
 	CARD_SI5_CN1 = 4
@@ -247,23 +245,22 @@ const (
 )
 
 var (
+	TIME_RESET = []byte{EE, EE}
 	BEEP_TWICE = []byte{STX, C_BEEP, 0x01, 0x02, 0x14, 0x0A, ETX}
 )
 
-func Bytes(args ...byte) []byte {
-	bs := []byte{}
-	for _, b := range args {
-		bs = append(bs, b)
-	}
-
-	return bs
-}
-
 func BytesMerge(args ...[]byte) []byte {
-	bs := []byte{}
-	for _, b := range args {
-		bs = append(bs, b...)
+	count := 0
+	for _, arr := range args {
+		count += len(arr)
 	}
-
+	bs := make([]byte, count)
+	i := 0
+	for _, arr := range args {
+		for _, el := range arr {
+			bs[i] = el
+			i++
+		}
+	}
 	return bs
 }

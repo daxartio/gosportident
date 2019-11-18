@@ -1,127 +1,59 @@
 package sireader
 
 import (
+	"reflect"
 	"testing"
-	"fmt"
-	"log"
-	"bytes"
 )
 
-func TestNewReader(t *testing.T) {
-	reader, err := NewReader("COM3")
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestBytesToInt(t *testing.T) {
+	sample := []byte{0x14, 0x0A}
+	// sample := []byte("\x14\x0a")
+	expectedInt := 5130
 
-	// FI
-	buf := make([]byte, 128)
-	n, err := reader.port.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(buf[:n])
-	fmt.Println(toInt(buf[:n]))
-
-	buf = make([]byte, 128)
-	n, err = reader.port.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(buf[:n])
-	fmt.Println(toInt(buf[:n]))
-
-	// FO
-	buf = make([]byte, 128)
-	n, err = reader.port.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(buf[:n])
-	fmt.Println(toInt(buf[:n]))
-
-	buf = make([]byte, 128)
-	n, err = reader.port.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(buf[:n])
-	fmt.Println(toInt(buf[:n]))
-}
-
-type testBytesToInt struct {
-	values []byte
-	result int
-}
-
-var variable = []testBytesToInt{
-	{[]byte("\xee\xee"), 61166},
-	{TIME_RESET, 61166},
-	{[]byte{0x00}, 0},
-	{Bytes(BC_SI5_DET), 70},
-	{Bytes(BC_SI6_WRITEPAGE), 98},
-	{Bytes(0x02), 2},
-}
-
-func TestToInt(t *testing.T) {
-	println("TestToInt")
-
-	for _, v := range variable {
-		res := toInt(v.values)
-		if res != v.result {
-			t.Error(
-				"For", v.values,
-				"expected", v.result,
-				"got", res,
-			)
-		} else {
-			fmt.Println(v.values, " Ok")
-		}
+	sampleInt := toInt(sample)
+	if sampleInt != expectedInt {
+		t.Fatal("Converted bytes is not equal expected int", toInt(sample), expectedInt)
 	}
 }
 
-func TestToBytes(t *testing.T) {
-	println("TestToBytes")
-	for _, v := range variable {
-		res := toBytes(v.result)
-		if bytes.Equal(res, v.values) {
-			t.Error(
-				"For", v.result,
-				"expected", v.values,
-				"got", res,
-			)
-		} else {
-			fmt.Println(v.result, res, " Ok")
-		}
+func TestIntToBytes(t *testing.T) {
+	sample := 5130
+	expectedBytes := []byte{0x14, 0x0A}
+
+	sampleBytes := toBytes(sample)
+	if !reflect.DeepEqual(sampleBytes, expectedBytes) {
+		t.Fatal("Converted int is not equal expected bytes", sampleBytes, expectedBytes)
 	}
 }
 
-func TestToString(t *testing.T) {
-	println("TestToString")
-	fmt.Println(toBytes(65535))
+func TestCrcBeep(t *testing.T) {
+	sample := []byte{C_BEEP, 0x01, 0x02}
+	expectedCRC := []byte{0x14, 0x0A}
+
+	sampleCRC := crc(sample)
+	if !reflect.DeepEqual(sampleCRC, expectedCRC) {
+		t.Fatal("Crc is not equal expected bytes", toInt(sampleCRC), toInt(expectedCRC))
+	}
 }
 
 func TestCrc(t *testing.T) {
-	println("TestCrc")
-	b := Bytes(0x53, 0x08, 0x05, 0x01,
+	sample := []byte{
+		0x53, 0x00, 0x05, 0x01,
 		0x0F, 0xB5, 0x00, 0x00,
-		0x1E, 0x08)
-	//b := Bytes( 0x53,  0x00)
-	fmt.Println(b)
-	fmt.Println(crc(b))
-	fmt.Println(toInt(crc(b)))
-	fmt.Println(crc([]byte{}))
-	
-	println("TestCrc2")
-	cmdS := []byte{C_BEEP, 0x01, 0x02}
-	cmdR := []byte{0x14, 0x0A}
-	fmt.Println(cmdS, cmdR)
-	fmt.Println(crc(cmdS))
+		0x1E, 0x08,
+	}
+	expectedCRC := 0x2C12
+
+	sampleCRC := crc(sample)
+	if toInt(sampleCRC) != int(expectedCRC) {
+		t.Fatal("Crc is not equal expected bytes", toInt(sampleCRC), int(expectedCRC))
+	}
 }
 
-func TestCrcCheck(t *testing.T) {
-
-}
-
-func TestDecodeTime(t *testing.T) {
-
+func TestBytesMerge(t *testing.T) {
+	sample := [][]byte{[]byte{C_BEEP, 0x01, 0x02}, []byte{0x03}, []byte{}}
+	expected := []byte{C_BEEP, 0x01, 0x02, 0x03}
+	if !reflect.DeepEqual(BytesMerge(sample...), expected) {
+		t.Fatal("Merged bytes is not equal expected bytes")
+	}
 }
