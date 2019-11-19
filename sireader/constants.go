@@ -171,22 +171,23 @@ const (
 
 //Extended protocol commands
 const (
-	CGetBackup   byte = 0x81
-	CSetSysVal   byte = 0x82
-	CGetSysVal   byte = 0x83
-	CSrrWrite    byte = 0xA2
-	CSrrRead     byte = 0xA3
-	CSrrQuery    byte = 0xA6
-	CSrrPing     byte = 0xA7
-	CSrrAdhoc    byte = 0xA8
-	CGetSi5      byte = 0xB1
-	CSi5Write    byte = 0xC3
-	CTransRec    byte = 0xD3
-	CClearCard   byte = 0xE0
-	CGetSi6      byte = 0xE1
-	CSi5Det      byte = 0xE5
-	CSi6Det      byte = 0xE6
-	CSiRem       byte = 0xE7
+	CGetBackup byte = 0x81
+	CSetSysVal byte = 0x82
+	CGetSysVal byte = 0x83
+	CSrrWrite  byte = 0xA2
+	CSrrRead   byte = 0xA3
+	CSrrQuery  byte = 0xA6
+	CSrrPing   byte = 0xA7
+	CSrrAdhoc  byte = 0xA8
+	CGetSi5    byte = 0xB1
+	CSi5Write  byte = 0xC3
+	CTransRec  byte = 0xD3
+	CClearCard byte = 0xE0
+	CGetSi6    byte = 0xE1
+	CSi5Det    byte = 0xE5
+	CSi6Det    byte = 0xE6
+	CSiRem     byte = 0xE7
+	//SI-card 8/9/10/11/p/t inserted
 	CSi9Det      byte = 0xE8
 	CSi9Write    byte = 0xEA
 	CGetSi9      byte = 0xEF

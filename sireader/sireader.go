@@ -1,7 +1,7 @@
 package sireader
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"log"
 	"time"
 
@@ -23,6 +23,25 @@ type Reader struct {
 	protoConfig ProtoConfig
 	debug       bool
 	logfile     string
+}
+
+//RCmd is readable cmd
+type RCmd struct {
+	cmd         []byte
+	stationCode int
+	parameters  []byte
+}
+
+//IsCmd is predicating to cmd equal
+func (c *RCmd) IsCmd(cmd byte) bool {
+	return c.cmd[0] == cmd
+}
+
+//RCard is readable card
+type RCard struct {
+	stationCode int
+	cardNumber  int
+	cardType    int
 }
 
 //NewReader is constructor of Reader
@@ -52,10 +71,11 @@ func NewReader(port string) (*Reader, error) {
 
 //GetTime is returning time object
 func (r *Reader) GetTime() *time.Time {
-	_, _, parameters, err := r.sendCommand([]byte{CGetTime}, []byte{})
+	rCmd, err := r.sendCommand([]byte{CGetTime}, []byte{})
 	if err != nil {
 		return nil
 	}
+	parameters := rCmd.parameters
 	year := toInt(parameters[:1]) + 1971
 	month := toInt(parameters[1:2])
 	day := toInt(parameters[2:3])
@@ -74,7 +94,23 @@ func (r *Reader) GetTime() *time.Time {
 
 //Beep cmd for si station
 func (r *Reader) Beep() {
-	_, _, _, _ = r.sendCommand([]byte{CBeep}, toBytes(1))
+	_, _ = r.sendCommand([]byte{CBeep}, toBytes(1))
+}
+
+//Poll is observing to si card inserting
+func (r *Reader) Poll() (*RCard, error) {
+	rCmd, err := r.readCommand()
+	if err != nil {
+		return nil, err
+	}
+	if rCmd.IsCmd(CSi9Det) {
+		rCard := new(RCard)
+		rCard.stationCode = rCmd.stationCode
+		rCard.cardNumber = toInt(rCmd.parameters[1:])
+		log.Println(rCard)
+		return rCard, nil
+	}
+	return nil, nil
 }
 
 //func (r *Reader) PowerOff() {}
@@ -110,18 +146,18 @@ func decodeCardNr(number int) int {
 
 //func decodeCardData() {}
 
-func (r *Reader) sendCommand(command, parameters []byte) ([]byte, int, []byte, error) {
+func (r *Reader) sendCommand(command, parameters []byte) (*RCmd, error) {
 	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
 	cmd = BytesMerge([]byte{STX}, cmd, crc(cmd), []byte{ETX})
 
 	_, err := r.port.Write(cmd)
 	if err != nil {
-		return nil, 0, nil, err
+		return nil, err
 	}
 	return r.readCommand()
 }
 
-func (r *Reader) readCommand() ([]byte, int, []byte, error) {
+func (r *Reader) readCommand() (*RCmd, error) {
 	var cmd []byte
 	var parameters []byte
 	var crc []byte
@@ -133,7 +169,7 @@ Loop:
 		buf := make([]byte, 128)
 		n, err := r.port.Read(buf)
 		if err != nil {
-			return nil, 0, nil, err
+			return nil, err
 		}
 		log.Printf("buf %q", buf[:n])
 		for _, b := range buf[:n] {
@@ -161,9 +197,13 @@ Loop:
 	}
 	log.Printf("cmd %q station %q parameters %q crc %q", cmd, stationCode, parameters, crc)
 	if !crcCheck(BytesMerge(cmd, toBytes(parametersLength), stationCode, parameters), crc) {
-		return nil, 0, nil, errors.New("CRC check failed")
+		return nil, errors.New("CRC check failed")
 	}
-	return cmd, toInt(stationCode), parameters, nil
+	rCmd := new(RCmd)
+	rCmd.cmd = cmd
+	rCmd.stationCode = toInt(stationCode)
+	rCmd.parameters = parameters
+	return rCmd, nil
 }
 
 //ReaderReadout is struct for readout
