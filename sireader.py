@@ -28,10 +28,10 @@ from datetime import datetime, timedelta, time
 from logging import exception, debug
 from math import trunc
 
-try:
-    from serial import Serial
-    from serial.serialutil import SerialException
-    from six import int2byte, byte2int, iterbytes, PY3
+from serial import Serial
+from serial.serialutil import SerialException
+from six import int2byte, byte2int, iterbytes, PY3
+
 if PY3:
     # Make byte2int on Python 3.x compatible with
     # the fact that indexing into a byte variable
@@ -42,9 +42,6 @@ if PY3:
             return x[0]
         except TypeError:
             return x
-except ModuleNotFoundError:
-    pass
-
 
 
 class SIReader(object):
@@ -91,7 +88,6 @@ class SIReader(object):
     BC_RESET = b'\x79'
     BC_GET_BACKUP2 = b'\x7A'  # (for extended start and extended finish only) Note: response carries b'\xCA'!
     BC_SET_BAUD = b'\x7E'  # \x00=4800 baud, \x01=38400 baud
-
 
     # Extended protocol commands
     C_GET_BACKUP = b'\x81'
@@ -897,7 +893,7 @@ class SIReader(object):
 
         """if 192 punches mode for SI6 is activated, station sends 8 blocks"""
         if len(data) == 128 * 8 and card_type == 'SI10':
-            i += 128 * 3 # skip 3 blocks with personalisation info
+            i += 128 * 3  # skip 3 blocks with personalisation info
 
         while p < punch_count:
             if card_type == 'SI5' and i % 16 == 0:
@@ -926,7 +922,8 @@ class SIReader(object):
             if self._logger:
                 self._logger.debug("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
                                                                                  ' '.join(
-                                                                                     [hexlify(int2byte(c)).decode('ascii') for c in
+                                                                                     [hexlify(int2byte(c)).decode(
+                                                                                         'ascii') for c in
                                                                                       parameters]),
                                                                                  hexlify(crc).decode('ascii'),
                                                                                  ))
@@ -1018,7 +1015,8 @@ class SIReader(object):
                     raise SIReaderException('CRC check failed')
 
                 if self._logfile:
-                    self._logfile.write('r %s %s\n' % (datetime.now(), char + cmd + length + station + data + crc + etx))
+                    self._logfile.write(
+                        'r %s %s\n' % (datetime.now(), char + cmd + length + station + data + crc + etx))
                     self._logfile.flush()
                     os.fsync(self._logfile)
 
@@ -1215,7 +1213,7 @@ class SIReaderReadout(SIReader):
             elif self.sicard >= 500000 and self.sicard <= 999999:
                 self.cardtype = 'SI6'
             #  special case: SI Cards for OL WM 2003
-            elif self.sicard >= 2003000  and self.sicard <= 2003799:
+            elif self.sicard >= 2003000 and self.sicard <= 2003799:
                 self.cardtype = 'SI6'
             # SI 6* (star)
             elif self.sicard >= 16711680 and self.sicard <= 16777215:
@@ -1293,7 +1291,7 @@ class SIReaderControl(SIReader):
             if c[0] == SIReader.C_TRANS_REC:
                 code = self.station_code
                 if code > 3000:
-                    code -= 16*16*16*8
+                    code -= 16 * 16 * 16 * 8
                 self.punches.append((self._decode_cardnr(c[1][SIReader.T_CN:SIReader.T_CN + 4]),
                                      self._decode_time(c[1][SIReader.T_TIME:SIReader.T_TIME + 2],
                                                        raw_ptd=c[1][SIReader.T_TIME - 1],
@@ -1336,7 +1334,7 @@ class SRRPunch(object):
         """
         self.card_number = SIReader._to_int(data[1:4])
 
-        if station > 3000:   # TODO ask vendor about this
+        if station > 3000:  # TODO ask vendor about this
             self.station_code = station - 16 * 16 * 16 * 8
         else:
             self.station_code = station
@@ -1362,6 +1360,7 @@ class SRRPunch(object):
 
 class SRRGroup(object):
     """Service class to group and sort SRR punches, received during radio readout"""
+
     def __init__(self):
         self.card = 0
         self.count = 1

@@ -36,6 +36,26 @@ func TestCrcBeep(t *testing.T) {
 	}
 }
 
+func TestReturnedCrcBeep(t *testing.T) {
+	sample := []byte("\xF9\x03\x00\x04\x01")
+	expectedCRC := []byte{0xF5, 0x0F}
+
+	sampleCRC := crc(sample)
+	if toInt(sampleCRC) != toInt(expectedCRC) {
+		t.Fatal("Crc is not equal expected bytes", toInt(sampleCRC), toInt(expectedCRC))
+	}
+}
+
+func TestSomeCrc(t *testing.T) {
+	sample := []byte("\xF7\x00")
+	expectedCRC := []byte{0xF7, 0x00}
+
+	sampleCRC := crc(sample)
+	if toInt(sampleCRC) != toInt(expectedCRC) {
+		t.Fatal("Crc is not equal expected bytes", toInt(sampleCRC), toInt(expectedCRC))
+	}
+}
+
 func TestCrc(t *testing.T) {
 	sample := []byte{
 		0x53, 0x00, 0x05, 0x01,

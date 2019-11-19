@@ -1,6 +1,6 @@
 package sireader
 
-// Weekday encoding (only for reference, currently unused)
+//Weekday encoding (only for reference, currently unused)
 const (
 	DSunday    = 0x000
 	DMonday    = 0x001
@@ -18,7 +18,7 @@ const RecLen = 8
 //EE General card data structure value
 const EE = 0xEE
 
-// SI Card data structures
+//SI Card data structures
 const (
 	CardSi5Cn2 = 6
 	CardSi5Cn1 = 4
@@ -41,7 +41,7 @@ const (
 	CardSi5Ptl = 2
 )
 
-// SI Card data structures
+//SI Card data structures
 const (
 	CardSi6Cn2 = 11
 	CardSi6Cn1 = 12
@@ -64,7 +64,7 @@ const (
 	CardSi6Ptl = 3
 )
 
-// SI Card data structures
+//SI Card data structures
 const (
 	CardSi8Cn2 = 25
 	CardSi8Cn1 = 26
@@ -88,7 +88,7 @@ const (
 	CardSi8Bc  = 2
 )
 
-// SI Card data structures
+//SI Card data structures
 const (
 	CardSi10Cn2 = 25
 	CardSi10Cn1 = 26
@@ -112,26 +112,26 @@ const (
 	CardSi10Bc  = 8
 )
 
-// Punch trigger in control mode data structure
+//Punch trigger in control mode data structure
 const (
 	TOffset = 8
 	TCn     = 0
 	TTime   = 5
 )
 
-// Backup memory in control mode
+//Backup memory in control mode
 const (
 	BcCn   = 3
 	BcTime = 8
 )
 
-// Crc
+//Crc
 const (
 	CrcPolynom = 0x8005
 	CrcBitf    = 0x8000
 )
 
-// Protocol characters
+//Protocol characters
 const (
 	STX    byte = 0x02
 	ETX    byte = 0x03
@@ -141,7 +141,7 @@ const (
 	WAKEUP byte = 0xFF
 )
 
-// Basic protocol commands, currently unused
+//Basic protocol commands, currently unused
 const (
 	BcSetCardNo    byte = 0x30
 	BcGetSi5       byte = 0x31
@@ -169,7 +169,7 @@ const (
 	BcSetBaud      byte = 0x7E
 )
 
-// Extended protocol commands
+//Extended protocol commands
 const (
 	CGetBackup   byte = 0x81
 	CSetSysVal   byte = 0x82
@@ -200,14 +200,14 @@ const (
 	CSetBaud     byte = 0xFE
 )
 
-// Protocol Parameters
+//Protocol Parameters
 const (
 	PMsDirect   byte = 0x4D
 	PMsIndirect byte = 0x53
 	PSi6Cb      byte = 0x08
 )
 
-// offsets in system data
+//Offsets in system data
 const (
 	OOldSerial byte = 0x00
 	OOldCPUID  byte = 0x02
@@ -220,7 +220,7 @@ const (
 	OModelID   byte = 0x0B
 )
 
-// Service
+//Service
 const (
 	OMemSize   byte = 0x0D
 	OBatDate   byte = 0x15
@@ -242,7 +242,7 @@ const (
 	OSleepTime  byte = 0x7B
 )
 
-// SI station modes
+//SI station modes
 const (
 	MSIACSpecial = 0x01
 	MControl     = 0x02

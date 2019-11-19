@@ -1,7 +1,7 @@
 package sireader
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 	"log"
 	"time"
 
@@ -34,7 +34,11 @@ func NewReader(port string) (*Reader, error) {
 	}
 	r := new(Reader)
 	r.port = s
-	// r.ConnectReader()
+	//flush possibly available input
+	err = r.port.Flush()
+	if err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 
@@ -47,30 +51,40 @@ func NewReader(port string) (*Reader, error) {
 //func (r *Reader) SetStationCode(code int) {}
 
 //GetTime is returning time object
-func (r *Reader) GetTime() time.Time {
-	bintTime, e := r.sendCommand([]byte{CGetTime}, []byte{})
-	fmt.Println(bintTime, e)
-	return time.Time{}
+func (r *Reader) GetTime() *time.Time {
+	_, _, parameters, err := r.sendCommand([]byte{CGetTime}, []byte{})
+	if err != nil {
+		return nil
+	}
+	year := toInt(parameters[:1]) + 1971
+	month := toInt(parameters[1:2])
+	day := toInt(parameters[2:3])
+	amPm := toInt(parameters[3:4]) & 0x1
+	second := toInt(parameters[4:6])
+	hour := amPm*12 + second/3600
+	second %= 3600
+	minute := second / 60
+	second %= 60
+	ms := toInt(parameters[6:7]) / 256.0 * 1000000
+	res := time.Date(year, time.Month(month+1), day, hour, minute, second, ms*1000000, time.Local)
+	return &res
 }
 
 //func (r *Reader) SetTime(t *time.Time) {}
 
 //Beep cmd for si station
 func (r *Reader) Beep() {
-	r.sendCommand([]byte{CBeep}, toBytes(1))
+	_, _, _, _ = r.sendCommand([]byte{CBeep}, toBytes(1))
 }
 
 //func (r *Reader) PowerOff() {}
 
-//func (r *Reader) Disconnect() {}
+//Disconnect is closing port
+func (r *Reader) Disconnect() error {
+	return r.port.Close()
+}
 
 //func (r *Reader) Reconnect() {}
-
-//ConnectReader connect reading
-func (r *Reader) ConnectReader() {
-	r.port.Flush()
-	r.sendCommand([]byte{CSetMs}, []byte{PMsDirect})
-}
 
 func (r *Reader) updateProtoConfig() ProtoConfig {
 	//ret, _ := r.sendCommand(Bytes(C_GET_SYS_VAL),Bytes(O_PROTO, 0x01))
@@ -86,63 +100,6 @@ func (r *Reader) updateProtoConfig() ProtoConfig {
 
 //func (r *Reader) SetProtoConfig(config ProtoConfig) {}
 
-func crc(b []byte) []byte {
-	toChars := func(s []byte) [][]byte {
-		if len(s) == 0 {
-			return nil
-		}
-		if len(s)%2 == 0 {
-			s = append(s, []byte{0x00, 0x00}...)
-		} else {
-			s = append(s, 0x00)
-		}
-		var result [][]byte
-		for i := 0; i < len(s); i++ {
-			result = append(result, s[i:i+2])
-			i++
-		}
-		return result
-	}
-
-	if len(b) < 1 {
-		return []byte{0x00, 0x00}
-	}
-	if len(b) == 2 {
-		return b
-	}
-
-	crc := uint16(toInt(b[:2]))
-	ch := toChars(b[2:])
-	for _, c := range ch {
-		val := uint16(toInt(c))
-		for j := 0; j < 16; j++ {
-			if (crc & CrcBitf) != 0 {
-				crc <<= 1
-
-				if (val & CrcBitf) != 0 {
-					crc++
-				}
-
-				crc ^= CrcPolynom
-			} else {
-				crc <<= 1
-
-				if (val & CrcBitf) != 0 {
-					crc++
-				}
-			}
-			val <<= 1
-		}
-	}
-
-	crc &= 0xFFFF
-	return BytesMerge(toBytes(int(crc>>8)), toBytes(int(crc&0xFF)))
-}
-
-func crcCheck(s string, crc string) bool {
-	return false
-}
-
 func decodeCardNr(number int) int {
 	return 0
 }
@@ -153,22 +110,60 @@ func decodeCardNr(number int) int {
 
 //func decodeCardData() {}
 
-func (r *Reader) sendCommand(command, parameters []byte) (int, error) {
+func (r *Reader) sendCommand(command, parameters []byte) ([]byte, int, []byte, error) {
 	cmd := BytesMerge(command, toBytes(len(parameters)), parameters)
 	cmd = BytesMerge([]byte{STX}, cmd, crc(cmd), []byte{ETX})
 
-	n, e := r.port.Write(cmd)
-	r.readCommand()
-	return n, e
+	_, err := r.port.Write(cmd)
+	if err != nil {
+		return nil, 0, nil, err
+	}
+	return r.readCommand()
 }
 
-func (r *Reader) readCommand() {
-	buf := make([]byte, 128)
-	n, err := r.port.Read(buf)
-	if err != nil {
-		log.Fatal(err)
+func (r *Reader) readCommand() ([]byte, int, []byte, error) {
+	var cmd []byte
+	var parameters []byte
+	var crc []byte
+	var stationCode []byte
+	var parametersLength int
+	var i int
+Loop:
+	for {
+		buf := make([]byte, 128)
+		n, err := r.port.Read(buf)
+		if err != nil {
+			return nil, 0, nil, err
+		}
+		log.Printf("buf %q", buf[:n])
+		for _, b := range buf[:n] {
+			if i == 1 {
+				cmd = []byte{b}
+			}
+			if i == 2 {
+				parametersLength = toInt([]byte{b})
+			}
+			if i > 2 && i <= 4 {
+				stationCode = append(stationCode, b)
+			}
+			if i > 4 && i <= parametersLength+2 {
+				parameters = append(parameters, b)
+			}
+			if i > parametersLength+2 && i <= parametersLength+4 {
+				crc = append(crc, b)
+			}
+			if i == parametersLength+5 {
+				break Loop
+			}
+			i++
+		}
+
 	}
-	log.Printf("%q", buf[:n])
+	log.Printf("cmd %q station %q parameters %q crc %q", cmd, stationCode, parameters, crc)
+	if !crcCheck(BytesMerge(cmd, toBytes(parametersLength), stationCode, parameters), crc) {
+		return nil, 0, nil, errors.New("CRC check failed")
+	}
+	return cmd, toInt(stationCode), parameters, nil
 }
 
 //ReaderReadout is struct for readout

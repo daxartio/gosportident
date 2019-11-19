@@ -31,8 +31,14 @@ func toInt(s []byte) int {
 }
 
 func toBytes(data int) []byte {
+	if data == 0 {
+		return []byte{0x00}
+	}
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.LittleEndian, uint32(data))
+	err := binary.Write(buf, binary.LittleEndian, uint32(data))
+	if err != nil {
+		panic(err)
+	}
 	b := bytes.Trim(buf.Bytes(), "\x00")
 	bLength := len(b)
 	result := make([]byte, bLength)
