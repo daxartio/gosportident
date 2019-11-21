@@ -1,5 +1,19 @@
 package sireader
 
+//CardType is enum for type of cards
+type CardType int
+
+//Variables of CardType
+const (
+	SI5 = iota + 1
+	SI6
+	SI8
+	SI9
+	SI10
+	SItCard
+	SIpCard
+)
+
 //Weekday encoding (only for reference, currently unused)
 const (
 	DSunday    = 0x000
@@ -186,7 +200,8 @@ const (
 	CGetSi6    byte = 0xE1
 	CSi5Det    byte = 0xE5
 	CSi6Det    byte = 0xE6
-	CSiRem     byte = 0xE7
+	//SI-card removed
+	CSiRem byte = 0xE7
 	//SI-card 8/9/10/11/p/t inserted
 	CSi9Det      byte = 0xE8
 	CSi9Write    byte = 0xEA

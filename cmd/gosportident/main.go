@@ -14,7 +14,11 @@ func main() {
 	}
 	r.Beep()
 	fmt.Println(r.GetTime())
-	r.Poll()
+	rCard, err := r.Poll()
+	if err == nil && rCard != nil {
+		r.ReadSICard(rCard)
+	}
+	r.Beep()
 	err = r.Disconnect()
 	if err != nil {
 		log.Fatal(err)

@@ -113,6 +113,22 @@ func (r *Reader) Poll() (*RCard, error) {
 	return nil, nil
 }
 
+//ReadSICard is reading data from card
+func (r *Reader) ReadSICard(rCard *RCard) (*RCard, error) {
+	var cmds []*RCmd
+	for i := 0; i < 8; i++ {
+		rCmd, err := r.sendCommand([]byte{CGetSi9}, toBytes(i))
+		if err != nil {
+			return nil, err
+		}
+		if rCmd.IsCmd(CSiRem) {
+			return nil, errors.New("SI-Card removed during command")
+		}
+		cmds = append(cmds, rCmd)
+	}
+	return nil, nil
+}
+
 //func (r *Reader) PowerOff() {}
 
 //Disconnect is closing port
